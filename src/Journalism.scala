@@ -64,7 +64,7 @@ class JournalismGame(inputBarC: InputBar, messageLogC: List[String], roomC: Room
 	override def makeImage(): WorldImage = {
 
 		return new TextImage(new Posn(5,5), "ey", new Black())
-					.overlayImages(inputBar.makeImage())
+					.overlayImages(makeMessageLogImage(messageLog), inputBar.makeImage())
 	}
 
 	override def onKeyEvent(ke: String): World = {
@@ -73,7 +73,7 @@ class JournalismGame(inputBarC: InputBar, messageLogC: List[String], roomC: Room
 			return this
 		} else {
 			ke match {
-				case "return" => return new JournalismGame(inputBar.onKeyEvent("clear"), messageLog, room, playerTree).processCommand(ke)
+				case "/" => return new JournalismGame(inputBar.onKeyEvent("clear"), messageLog, room, playerTree).processCommand(ke)
 				case _ => return new JournalismGame(inputBar.onKeyEvent(ke), messageLog, room, playerTree)
 			}
 		}
@@ -81,7 +81,16 @@ class JournalismGame(inputBarC: InputBar, messageLogC: List[String], roomC: Room
 
 	//handles text adventure commands when return key is pressed
 	def processCommand(ke: String): World = {
-		return new JournalismGame(inputBar, messageLog, room, playerTree)
+		return new JournalismGame(inputBar, messageLog :+ inputBar.str, room, playerTree)
+	}
+
+	def makeMessageLogImage(l: List[String], counter: Int = 1): WorldImage = {
+		if (l.length == 0)
+			return new TextImage(new Posn(0,0), "", new White())
+		else
+			return new TextImage(new Posn(50, 50)//offset, offset + counter*fontSize)
+				, l.head, new Black())
+							.overlayImages(makeMessageLogImage(l.drop(1), counter + 1))
 	}
 
 
@@ -101,7 +110,7 @@ class InputBar(xc: Int, yc: Int, widthc: Int, heightc: Int, strC: String) {
 	var width = widthc
 	var height = heightc
 
-	val offset = 3
+	val offset = 3.2
 	var str = strC
 
 	def makeImage(): WorldImage = {
@@ -126,7 +135,39 @@ class PlayerTree() {
 
 }
 
+///////////////
+/*trait Message {
+	def makeMessageImage(x: Int, y: Int): WorldImage
+	def getNumLines(): Int
+}
 
+class TextMessage(strC: String) extends Message = {
+	val str = strC
+	val charsPerLine = 80
+	val fontSize = 16
+	def makeMessageImage(x: Int, y: Int, lineIncrement: Int = 18): WorldImage = {
+		var strin = str
+		var strL = new List[String]()
+		while (strin.length() > 0) {
+			if (strin.length() < 80) {
+				strL :+ strin
+				strin = ""
+			} else {
+				strL :+ strin.substring(0, 80)
+				strin = strin.substring(80)
+			}
+		}
+		img = new TextImage(x, y - (getNumLines() * lineIncrement), strL.head)
+		var lineCounter = 1
+		for (var x <- strL) {
+			img = img.overlayImages(new TextImage(x, y - (getNumLines())))
+		}
+	}
+	def getNumLines(): Int = {
+		return str.length()/charsPerLine
+	}
+}
+*/
 /////////////////Different rooms
 trait Room {
 	def acceptsInput(): Boolean

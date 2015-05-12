@@ -5,10 +5,10 @@ JC = scalac
 	$(JC) $(JFLAGS) $*.scala
 
 CLASSES = \
-	./src/Journalism.scala \
+	./src/Game.scala \
 
 default: 
-	$(JC) ./src/Journalism.scala -cp "./javalib-1.0.3.jar:lib" -d bin
+	$(JC) ./src/Game.scala -cp "./javalib-1.0.3.jar:lib" -d bin
 
 classes: $(CLASSES:.java=.class)
 
@@ -17,4 +17,4 @@ clean:
 	$(RM) bin/*.class
 
 run:
-	scala -cp bin:javalib-1.0.3.jar Journalism
+	scala -cp bin:javalib-1.0.3.jar Game
